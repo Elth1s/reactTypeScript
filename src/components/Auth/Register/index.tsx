@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import InputGroup from "../../comon/InputGroup";
 import { useFormik, Form, FormikProvider } from 'formik';
 import * as Yup from 'yup';
-import { ILoginModel, LoginUser } from "../../../store/action-creators/auth";
 
 interface IRegisterModel {
     name: string,

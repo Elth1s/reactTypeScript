@@ -1,22 +1,19 @@
 import { Dispatch } from "react"
 import http from "../../http_common";
-import { AuthAction, AuthActionTypes, ILoginResponse } from "../../types/auth"
-
-export interface ILoginModel {
-    email: string,
-    password: string
-}
+import { AuthAction, AuthActionTypes } from "../../types/auth"
+import { ILoginModel, ILoginResponse } from "../../components/Auth/Login/types";
 
 export const LoginUser = (data: ILoginModel) => {
     return async (dispatch: Dispatch<AuthAction>) => {
         try {
-            dispatch({ type: AuthActionTypes.LOGIN_AUTH });
+            // dispatch({ type: AuthActionTypes.LOGIN_AUTH });
             const response = await http.post<ILoginResponse>('api/auth/login', data);
-
-            dispatch({ type: AuthActionTypes.LOGIN_AUTH_SUCCESS, payload: { email: "asd@asd.asd", image: "https://miro.medium.com/max/1200/1*mk1-6aYaf_Bes1E3Imhc0A.jpeg" } });
+            dispatch({ type: AuthActionTypes.LOGIN_AUTH_SUCCESS, payload: { name: response.data.user.name, email: response.data.user.email } });
+            return Promise.resolve();
         }
         catch (error) {
-            dispatch({ type: AuthActionTypes.LOGIN_AUTH_ERROR, payload: "Error" })
+            // dispatch({ type: AuthActionTypes.LOGIN_AUTH_ERROR, payload: "Error" })
+            return Promise.reject(error);
         }
     }
 }

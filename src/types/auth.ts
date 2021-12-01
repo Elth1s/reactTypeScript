@@ -5,13 +5,8 @@ export enum AuthActionTypes {
 }
 
 export interface IUser {
-    email: string,
-    image: string
-}
-
-export interface ILoginResponse {
-    access_token: string,
-    expires_in: string
+    name: string,
+    email: string
 }
 
 export interface AuthState {

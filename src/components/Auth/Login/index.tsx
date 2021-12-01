@@ -1,20 +1,31 @@
 import InputGroup from "../../comon/InputGroup";
 import { useFormik, Form, FormikProvider } from 'formik';
 import * as Yup from 'yup';
-import { ILoginModel, LoginUser } from "../../../store/action-creators/auth";
+import { ILoginModel } from "./types";
+import { useActions } from '../../../hooks/useActions'
+import { useNavigate } from 'react-router-dom';
 
-const LoginPage = () => {
+const LoginPage: React.FC = () => {
 
+    const { LoginUser } = useActions();
+    const navigate = useNavigate();
+    const passwordRegExp = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-_]).{8,}$/
     const LoginSchema = Yup.object().shape({
-        email: Yup.string().required('Email is required'),
-        password: Yup.string().required('Password is required')
+        email: Yup.string().email('Email must be a valid email address').required('Email is required'),
+        password: Yup.string().matches(passwordRegExp, 'Password is not valid').required('Password is required')
     });
     const initialValues: ILoginModel = { email: '', password: '' };
     const formik = useFormik({
         initialValues: initialValues,
         validationSchema: LoginSchema,
-        onSubmit: values => {
-            LoginUser(values);
+        onSubmit: async (values) => {
+            try {
+                await LoginUser(values);
+                navigate("/");
+            }
+            catch (error) {
+                console.log(error)
+            }
         }
     });
 
@@ -27,10 +38,7 @@ const LoginPage = () => {
             <FormikProvider value={formik} >
                 <Form autoComplete="off" noValidate onSubmit={handleSubmit} className="col col-6">
                     <div className="form-floating mb-3">
-                        <InputGroup
-                            label="Email"
-                            field="email"
-                        />
+                        <InputGroup label="Email" field="email" />
                         {touched.email && errors.email && <div className="text-danger">{errors.email}</div>}
                     </div>
                     <div className="form-floating mb-3">
