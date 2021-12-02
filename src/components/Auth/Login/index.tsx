@@ -4,6 +4,8 @@ import * as Yup from 'yup';
 import { ILoginModel } from "./types";
 import { useActions } from '../../../hooks/useActions'
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage: React.FC = () => {
 
@@ -22,10 +24,17 @@ const LoginPage: React.FC = () => {
             try {
                 await LoginUser(values);
                 navigate("/");
+                toast.success('Login Success!');
             }
-            catch (error) {
-                console.log(error)
+            catch (exeption) {
+                let message = "Login Failed! ";
+                if (exeption === 401)
+                    message += "The user with the entered data does not exist.";
+                if (exeption === 422)
+                    message += "Validation failed.";
+                toast.error(message);
             }
+
         }
     });
 
