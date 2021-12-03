@@ -11,3 +11,10 @@ export interface ILoginResponse {
     expires_in: string,
     user: IUser
 }
+
+export interface LoginServerError {
+    status: number,
+    email: Array<string>,
+    password: Array<string>,
+    error: string
+}

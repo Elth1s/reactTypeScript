@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTypedSelector } from "../../../hooks/useTypedSelector";
+import 'bootstrap/dist/js/bootstrap.bundle';
 const Header = () => {
     const { user, isAuth } = useTypedSelector((state) => state.auth);
     return (

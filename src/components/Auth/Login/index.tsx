@@ -1,7 +1,7 @@
 import InputGroup from "../../comon/InputGroup";
 import { useFormik, Form, FormikProvider } from 'formik';
 import * as Yup from 'yup';
-import { ILoginModel } from "./types";
+import { ILoginModel, LoginServerError } from "./types";
 import { useActions } from '../../../hooks/useActions'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -20,17 +20,24 @@ const LoginPage: React.FC = () => {
     const formik = useFormik({
         initialValues: initialValues,
         validationSchema: LoginSchema,
-        onSubmit: async (values) => {
+        onSubmit: async (values, { setFieldError }) => {
             try {
                 await LoginUser(values);
                 navigate("/");
                 toast.success('Login Success!');
             }
             catch (exeption) {
+                const serverErrors = exeption as LoginServerError;
+                if (serverErrors.email && serverErrors.email.length > 0) {
+                    setFieldError("email", serverErrors.email[0]);
+                }
+                if (serverErrors.password && serverErrors.password.length > 0) {
+                    setFieldError("password", serverErrors.password[0]);
+                }
                 let message = "Login Failed! ";
-                if (exeption === 401)
+                if (serverErrors.status === 401)
                     message += "The user with the entered data does not exist.";
-                if (exeption === 422)
+                if (serverErrors.status === 422)
                     message += "Validation failed.";
                 toast.error(message);
             }
@@ -46,14 +53,8 @@ const LoginPage: React.FC = () => {
             <h1 className="my-3">Login</h1>
             <FormikProvider value={formik} >
                 <Form autoComplete="off" noValidate onSubmit={handleSubmit} className="col col-6">
-                    <div className="form-floating mb-3">
-                        <InputGroup label="Email" field="email" />
-                        {touched.email && errors.email && <div className="text-danger">{errors.email}</div>}
-                    </div>
-                    <div className="form-floating mb-3">
-                        <InputGroup label="Password" field="password" type="password" />
-                        {touched.password && errors.password && <div className="text-danger">{errors.password}</div>}
-                    </div>
+                    <InputGroup label="Email" field="email" touched={touched.email} error={errors.email} />
+                    <InputGroup label="Password" field="password" type="password" touched={touched.password} error={errors.password} />
                     <div className="text-end">
                         <button type="submit" className="btn btn-primary">Login</button>
                     </div>
