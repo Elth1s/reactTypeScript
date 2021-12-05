@@ -2,11 +2,21 @@ export enum AuthActionTypes {
     LOGIN_AUTH = "LOGIN_AUTH",
     LOGIN_AUTH_SUCCESS = "LOGIN_AUTH_SUCCESS",
     LOGIN_AUTH_ERROR = "LOGIN_AUTH_ERROR",
+    REGISTER_AUTH = "REGISTER_AUTH",
+    REGISTER_AUTH_SUCCESS = " REGISTER_AUTH_SUCCESS",
+    REGISTER_AUTH_ERROR = "REGISTER_AUTH_FAILED",
 }
+
 
 export interface IUser {
     name: string,
     email: string
+}
+
+export interface ILoginResponse {
+    access_token: string,
+    expires_in: string,
+    user: IUser
 }
 
 export interface AuthState {
@@ -30,4 +40,19 @@ export interface LoginAuthErrorAction {
     payload: string
 }
 
-export type AuthAction = LoginAuthAction | LoginAuthSuccessAction | LoginAuthErrorAction;
+export interface RegisterAuthAction {
+    type: AuthActionTypes.REGISTER_AUTH
+}
+
+export interface RegisterAuthSuccessAction {
+    type: AuthActionTypes.REGISTER_AUTH_SUCCESS,
+    payload: IUser
+}
+
+export interface RegisterAuthErrorAction {
+    type: AuthActionTypes.REGISTER_AUTH_ERROR,
+    payload: string
+}
+
+export type LoginAction = LoginAuthAction | LoginAuthSuccessAction | LoginAuthErrorAction;
+export type RegisterAction = RegisterAuthAction | RegisterAuthSuccessAction | RegisterAuthErrorAction;
