@@ -8,6 +8,7 @@ import HomePage from './components/Home';
 import NoMatch from './components/NoMatch';
 import LoginPage from './components/Auth/Login';
 import RegisterPage from './components/Auth/Register';
+import ProfilePage from './components/Auth/Profile';
 import DefaultLayout from './components/containers/DefaultLayout';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
 
           <Route path="*" element={<NoMatch />} />
         </Route>

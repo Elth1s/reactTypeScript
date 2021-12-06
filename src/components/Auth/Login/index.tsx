@@ -28,12 +28,15 @@ const LoginPage: React.FC = () => {
             }
             catch (exeption) {
                 const serverErrors = exeption as LoginServerError;
-                if (serverErrors.email && serverErrors.email.length > 0) {
-                    setFieldError("email", serverErrors.email[0]);
-                }
-                if (serverErrors.password && serverErrors.password.length > 0) {
-                    setFieldError("password", serverErrors.password[0]);
-                }
+                Object.entries(serverErrors).forEach(([key, value]) => {
+                    if (Array.isArray(value)) {
+                        let message = "";
+                        value.forEach((item) => {
+                            message += `${item} `;
+                        });
+                        setFieldError(key, message);
+                    }
+                });
                 let message = "Login Failed! ";
                 if (serverErrors.status === 401)
                     message += "The user with the entered data does not exist.";

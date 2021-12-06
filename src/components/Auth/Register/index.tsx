@@ -32,15 +32,15 @@ const RegisterPage = () => {
             }
             catch (exeption) {
                 const serverErrors = exeption as RegisterServerError;
-                if (serverErrors.name && serverErrors.name.length > 0) {
-                    setFieldError("name", serverErrors.name[0]);
-                }
-                if (serverErrors.email && serverErrors.email.length > 0) {
-                    setFieldError("email", serverErrors.email[0]);
-                }
-                if (serverErrors.password && serverErrors.password.length > 0) {
-                    setFieldError("password", serverErrors.password[0]);
-                }
+                Object.entries(serverErrors).forEach(([key, value]) => {
+                    if (Array.isArray(value)) {
+                        let message = "";
+                        value.forEach((item) => {
+                            message += `${item} `;
+                        });
+                        setFieldError(key, message);
+                    }
+                });
                 let message = "Register Failed! ";
                 if (serverErrors.status === 422)
                     message += "Validation failed.";
