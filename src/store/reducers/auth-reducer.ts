@@ -1,4 +1,4 @@
-import { LoginAction, RegisterAction, AuthState, AuthActionTypes } from '../../types/auth'
+import { LoginAction, RegisterAction, AuthState, AuthActionTypes, ProfileAction } from '../../types/auth'
 
 const initialState: AuthState = {
     user: {
@@ -10,7 +10,7 @@ const initialState: AuthState = {
     loading: false
 }
 
-export const authReducer = (state = initialState, action: LoginAction | RegisterAction): AuthState => {
+export const authReducer = (state = initialState, action: LoginAction | RegisterAction | ProfileAction): AuthState => {
     switch (action.type) {
         case AuthActionTypes.LOGIN_AUTH_SUCCESS:
             return {
@@ -23,6 +23,11 @@ export const authReducer = (state = initialState, action: LoginAction | Register
                 ...state,
                 user: action.payload,
                 isAuth: true
+            }
+        case AuthActionTypes.GET_PROFILE:
+            return {
+                ...state,
+                user: action.payload,
             }
         default:
             return state;

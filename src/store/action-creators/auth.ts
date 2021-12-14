@@ -2,7 +2,7 @@ import { Dispatch } from "react"
 import http from "../../http_common";
 import axios, { AxiosError } from "axios";
 import jwt from "jsonwebtoken";
-import { LoginAction, RegisterAction, AuthActionTypes, ILoginResponse, IUser } from "../../types/auth"
+import { LoginAction, RegisterAction, AuthActionTypes, ILoginResponse, IUser, ProfileAction } from "../../types/auth"
 import { ILoginModel, LoginServerError } from "../../components/Auth/Login/types";
 import { IRegisterModel, RegisterServerError } from "../../components/Auth/Register/types";
 
@@ -54,14 +54,20 @@ export const RegisterUser = (data: IRegisterModel) => {
     }
 }
 
-export const GetUserProfile = async () => {
-    return async () => {
-        await http.get('api/auth/user-profile')
-            .then(response => {
-                return response;
-            }).catch(error => {
-                console.log(error)
+export const GetUserProfile = () => {
+    return async (dispatch: Dispatch<ProfileAction>) => {
+        try {
+            const response = await http.get<IUser>('api/auth/user-profile');
+            const data = response.data;
+            dispatch({
+                type: AuthActionTypes.GET_PROFILE,
+                payload: { name: data.name, email: data.email },
             });
+            return Promise.resolve();
+        } catch (ex) {
+            console.log("Problem get");
+            return Promise.reject();
+        }
     }
 }
 

@@ -46,7 +46,6 @@ const RegisterPage = () => {
                     message += "Validation failed.";
                 toast.error(message);
             }
-
         }
     });
     const { errors, touched, handleSubmit } = formik;

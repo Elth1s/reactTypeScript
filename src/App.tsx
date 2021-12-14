@@ -10,6 +10,9 @@ import LoginPage from './components/Auth/Login';
 import RegisterPage from './components/Auth/Register';
 import ProfilePage from './components/Auth/Profile';
 import DefaultLayout from './components/containers/DefaultLayout';
+import ProductList from './components/Products/List';
+import CreateProduct from './components/Products/Create';
+import UpdateProduct from './components/Products/Update';
 
 function App() {
   return (
@@ -31,6 +34,10 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+
+          <Route path="/products/list" element={<ProductList />} />
+          <Route path="/products/create" element={<CreateProduct />} />
+          <Route path="/products/update" element={<UpdateProduct />} />
 
           <Route path="*" element={<NoMatch />} />
         </Route>

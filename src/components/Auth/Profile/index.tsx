@@ -1,59 +1,62 @@
 import { useEffect } from "react";
 import { useState } from 'react';
 import { IUser } from "../../../types/auth";
-import InputGroup from "../../comon/InputGroup";
-import { useFormik, Form, FormikProvider } from 'formik';
-import * as Yup from 'yup';
 import { useActions } from '../../../hooks/useActions'
-import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useTypedSelector } from "../../../hooks/useTypedSelector";
 
 const ProfilePage: React.FC = () => {
     const { GetUserProfile } = useActions();
 
-    const initialState: IUser = {
-        name: "",
-        email: "",
-    }
-    const [state, setState] = useState<IUser>(initialState);
+    const { user } = useTypedSelector((store) => store.auth);
     useEffect(() => {
-        console.log("profile start")
-        // GetUserProfile().then(response => {
-        //     console.log(response)
-        //     console.log("profile end")
-        // });
-    })
-
-    const ProfileSchema = Yup.object().shape({
-        name: Yup.string().min(2).max(100).required('Name is required'),
-        email: Yup.string().email('Email must be a valid email address').required('Email is required'),
-    });
-    const formik = useFormik({
-        enableReinitialize: true,
-        initialValues: initialState,
-        validationSchema: ProfileSchema,
-        onSubmit: values => {
-            console.log("Edit profile")
+        async function fetchMyAPI() {
+            try {
+                await GetUserProfile();
+            }
+            catch (ex) {
+                console.log("error", ex);
+            }
         }
-    });
+        fetchMyAPI();
+    }, [])
 
-    const { errors, touched, handleSubmit } = formik;
     return (
         <>
             <h1 className="my-3">Profile</h1>
-            <FormikProvider value={formik} >
-                <Form autoComplete="off" noValidate onSubmit={handleSubmit} className="row">
-                    <div className="col col-6">
-                        <InputGroup label="Name" field="name" touched={touched.name} error={errors.name} />
-                        <InputGroup label="Email" field="email" touched={touched.email} error={errors.email} />
-                        <div className="text-end">
-                            <button type="submit" className="btn btn-primary">Login</button>
+            <div className="row ">
+                <div className="col-lg-4">
+                    <div className="card mb-4">
+                        <div className="card-body text-center card-height">
+                            <img src="https://mdbootstrap.com/img/Photos/new-templates/bootstrap-chat/ava3.png" alt="avatar" className="rounded-circle img-fluid" width="150px" />
                         </div>
                     </div>
-                    <div className="col col-6">
+                </div>
+                <div className="col-lg-8">
+                    <div className="card mb-4">
+                        <div className="card-body card-height">
+                            <div className="row">
+                                <div className="col-sm-3">
+                                    <p className="mb-0">Name</p>
+                                </div>
+                                <div className="col-sm-9">
+                                    <p className="text-muted mb-0">{user.name}</p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div className="row">
+                                <div className="col-sm-3">
+                                    <p className="mb-0">Email</p>
+                                </div>
+                                <div className="col-sm-9">
+                                    <p className="text-muted mb-0">{user.email}</p>
+                                </div>
+                            </div>
+                            <hr />
+                        </div>
                     </div>
-                </Form>
-            </FormikProvider>
+                </div>
+            </div >
         </>
     );
 }

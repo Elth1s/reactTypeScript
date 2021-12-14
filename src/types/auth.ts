@@ -5,6 +5,7 @@ export enum AuthActionTypes {
     REGISTER_AUTH = "REGISTER_AUTH",
     REGISTER_AUTH_SUCCESS = " REGISTER_AUTH_SUCCESS",
     REGISTER_AUTH_ERROR = "REGISTER_AUTH_FAILED",
+    GET_PROFILE = "GET_PROFILE"
 }
 
 
@@ -54,5 +55,11 @@ export interface RegisterAuthErrorAction {
     payload: string
 }
 
+export interface GetProfileAction {
+    type: AuthActionTypes.GET_PROFILE,
+    payload: IUser
+}
+
 export type LoginAction = LoginAuthAction | LoginAuthSuccessAction | LoginAuthErrorAction;
 export type RegisterAction = RegisterAuthAction | RegisterAuthSuccessAction | RegisterAuthErrorAction;
+export type ProfileAction = GetProfileAction;

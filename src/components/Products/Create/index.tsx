@@ -1,33 +1,30 @@
 import InputGroup from "../../comon/InputGroup";
 import { useFormik, Form, FormikProvider } from 'formik';
-import * as Yup from 'yup';
-import { ILoginModel, LoginServerError } from "./types";
+import { IProduct, UpsertProductServerError } from "../types";
 import { useActions } from '../../../hooks/useActions'
 import { useNavigate } from 'react-router-dom';
+import { ProductSchema } from "../validation";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const LoginPage: React.FC = () => {
+const CreateProduct = () => {
 
-    const { LoginUser } = useActions();
+    const { CreateProduct } = useActions();
     const navigate = useNavigate();
-    const passwordRegExp = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-_]).{8,}$/
-    const LoginSchema = Yup.object().shape({
-        email: Yup.string().email('Email must be a valid email address').required('Email is required'),
-        password: Yup.string().matches(passwordRegExp, 'Password is not valid').required('Password is required')
-    });
-    const initialValues: ILoginModel = { email: '', password: '' };
+
+
+    const initialValues: IProduct = { name: '', detail: '' };
     const formik = useFormik({
         initialValues: initialValues,
-        validationSchema: LoginSchema,
+        validationSchema: ProductSchema,
         onSubmit: async (values, { setFieldError }) => {
             try {
-                await LoginUser(values);
-                navigate("/");
-                toast.success('Login Success!');
+                await CreateProduct(values);
+                navigate("/products/list");
+                toast.success('Product created successfully.');
             }
             catch (exeption) {
-                const serverErrors = exeption as LoginServerError;
+                const serverErrors = exeption as UpsertProductServerError;
                 Object.entries(serverErrors).forEach(([key, value]) => {
                     if (Array.isArray(value)) {
                         let message = "";
@@ -37,33 +34,39 @@ const LoginPage: React.FC = () => {
                         setFieldError(key, message);
                     }
                 });
-                let message = "Login Failed! ";
-                if (serverErrors.status === 401)
-                    message += "The user with the entered data does not exist.";
+                let message = "Create Product Failed! ";
                 if (serverErrors.status === 422)
                     message += "Validation failed.";
                 toast.error(message);
             }
-
         }
     });
-
     const { errors, touched, handleSubmit } = formik;
-
     return (
-        <>
-            <h1 className="my-3">Login</h1>
+        <div>
+            <h1 className="my-3">Create Product</h1>
             <FormikProvider value={formik} >
                 <Form autoComplete="off" noValidate onSubmit={handleSubmit} className="col col-6">
-                    <InputGroup label="Email" field="email" touched={touched.email} error={errors.email} />
-                    <InputGroup label="Password" field="password" type="password" touched={touched.password} error={errors.password} />
+                    <InputGroup
+                        label="Name"
+                        field="name"
+                        touched={touched.name}
+                        error={errors.name}
+                    />
+                    <InputGroup
+                        label="Detail"
+                        field="detail"
+                        touched={touched.detail}
+                        error={errors.detail}
+                    />
                     <div className="text-end">
-                        <button type="submit" className="btn btn-primary">Login</button>
+                        <button type="submit" className="btn btn-primary">Create</button>
                     </div>
                 </Form>
             </FormikProvider>
-        </>
+        </div >
+
     );
 }
 
-export default LoginPage;
+export default CreateProduct;
