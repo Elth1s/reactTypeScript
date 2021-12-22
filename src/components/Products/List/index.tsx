@@ -17,22 +17,24 @@ const ProductList: React.FC = () => {
     const [search, setSearch] = useState<IProductSearch>(
         {
             page: searchParams.get("page"),
+            id: searchParams.get("id"),
             name: searchParams.get("name"),
+            detail: searchParams.get("detail"),
         }
     )
-    useEffect(() => {
-        async function getProducts() {
-            setLoading(true);
-            try {
-                await GetProducts(search);
-                setLoading(false);
-            } catch (ex) {
-                console.log("Problem fetch");
-                setLoading(false);
-            }
+    async function getProducts() {
+        setLoading(true);
+        try {
+            await GetProducts(search);
+            setLoading(false);
+        } catch (ex) {
+            console.log("Problem fetch");
+            setLoading(false);
         }
+    }
+    useEffect(() => {
         getProducts();
-    }, [search]);
+    }, [search.page]);
 
     const DeleteProductHandle = async (id: number) => {
         setLoading(true);
@@ -49,6 +51,37 @@ const ProductList: React.FC = () => {
         }
     }
 
+    const ChangeIdHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let data: IProductSearch = {
+            ...search,
+            id: e.target.value,
+        };
+        setSearch(data);
+    }
+    const ChangeNameHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let data: IProductSearch = {
+            ...search,
+            name: e.target.value,
+        };
+        setSearch(data);
+    }
+    const ChangeDetailHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let data: IProductSearch = {
+            ...search,
+            detail: e.target.value,
+        };
+        setSearch(data);
+    }
+    const onClickSearch = () => {
+        let data: IProductSearch = {
+            ...search,
+            page: 1
+        };
+        setSearch(data)
+        setSearchParams(qs.stringify(data));
+        getProducts()
+    }
+
     const buttons = [];
     for (var i = 1; i <= last_page; i++) {
         buttons.push(i);
@@ -63,7 +96,22 @@ const ProductList: React.FC = () => {
             </div>
             {loading ? <h2>Loading ...</h2> :
                 <>
+                    <div className="row my-2  me-1">
+                        <div className="col-12 py-2 py-md-0 col-sm-6 col-md">
+                            <input type="text" className="form-control" placeholder="id" value={search.id ?? ""} onChange={ChangeIdHandler} />
+                        </div>
+                        <div className="col-12 py-2 py-md-0 col-sm-6 col-md">
+                            <input type="text" className="form-control" placeholder="name" value={search.name ?? ""} onChange={ChangeNameHandler} />
+                        </div>
+                        <div className="col-12 py-2 py-md-0 col-sm-6 col-md">
+                            <input type="text" className="form-control" placeholder="detail" value={search.detail ?? ""} onChange={ChangeDetailHandler} />
+                        </div>
+                        <div className="col-12 py-2 py-md-0 col-sm-6 col-md-3 col-lg-2 px-md-0 ms-auto">
+                            <Link className="btn btn-primary w-100" onClick={onClickSearch} to={"?" + qs.stringify({ page: 1, id: search.id, name: search.name, detail: search.detail })}>Search</Link>
+                        </div>
+                    </div>
                     <table className="table">
+
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
@@ -77,8 +125,11 @@ const ProductList: React.FC = () => {
                                 return (
                                     <tr key={item.id}>
                                         <td width="10%">{item.id}</td>
-                                        <td width="35%">{item.name}</td>
-                                        <td width="35%">{item.detail}</td>
+                                        <td width="10%">
+                                            <img src={`http://local.laravel.pu911.com:100${item.image}`} alt='манул' width='100' />
+                                        </td>
+                                        <td width="30%">{item.name}</td>
+                                        <td width="30%">{item.detail}</td>
                                         <td width="20%">
                                             <div className="row">
                                                 <Link to={'/products/update?id=' + item.id} className="btn btn-warning w-auto me-3">Edit</Link>
@@ -92,15 +143,20 @@ const ProductList: React.FC = () => {
                     </table>
                     <div className="text-end">
                         {buttons.map((item, key) => {
+                            const data: IProductSearch = {
+                                ...search,
+                                page: item,
+                            };
                             return (
                                 <Link
                                     onClick={() => {
-                                        setSearch({ page: item })
+                                        setSearch(data);
+                                        setSearchParams(qs.stringify(data));
                                     }}
                                     key={key}
-                                    to={"/products/list?page=" + item}
+                                    to={"?" + qs.stringify(data)}
                                     className={classNames("btn btn-dark mx-1",
-                                        { "disabled": item == search.page }
+                                        { "disabled": item == search.page || (item == 1 && search.page == null) }
                                     )}
                                 >
                                     {item}

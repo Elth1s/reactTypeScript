@@ -6,7 +6,8 @@ const initialState: ProductsState = {
     currentProduct: {
         id: 0,
         name: "",
-        detail: ""
+        detail: "",
+        image: ""
     }
 }
 

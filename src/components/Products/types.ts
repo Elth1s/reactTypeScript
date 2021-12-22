@@ -7,12 +7,13 @@ export enum ProductsActionTypes {
 export interface IProductItem {
     id: number,
     name: string,
-    detail: string
+    detail: string,
+    image: string
 }
 
 export interface IProduct {
     name: string,
-    detail: string
+    detail: string,
 }
 
 export interface IProductsModel {
@@ -28,7 +29,9 @@ export interface IProductModel {
 
 export interface IProductSearch {
     page?: null | number | string,
+    id?: null | number | string,
     name?: null | string,
+    detail?: null | string,
 }
 
 export interface UpsertProductServerError {

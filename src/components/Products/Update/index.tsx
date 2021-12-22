@@ -8,6 +8,7 @@ import { ProductSchema } from "../validation";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useTypedSelector } from "../../../hooks/useTypedSelector";
+import React from "react";
 
 const UpdateProduct = () => {
 
@@ -15,6 +16,8 @@ const UpdateProduct = () => {
     const [loadingPage, setLoadingPage] = useState<boolean>(false);
 
     const { currentProduct } = useTypedSelector((store) => store.product);
+    const [fileSelected, setFileSelected] = React.useState<string>("")
+    const [fileForSend, setFileForSend] = React.useState<File>()
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -22,7 +25,7 @@ const UpdateProduct = () => {
             setLoadingPage(true);
             try {
                 const url = window.location.search;
-                const params = new URLSearchParams(url); // id=123
+                const params = new URLSearchParams(url);
                 let id = params.get("id");
                 if (id === null) {
                     navigate("/");
@@ -38,13 +41,22 @@ const UpdateProduct = () => {
         getProduct();
     }, []);
 
+    const handleImageChange = function (e: React.ChangeEvent<HTMLInputElement>) {
+        const fileList = e.target.files;
+
+        if (!fileList) return;
+        console.log(fileList)
+        setFileSelected(URL.createObjectURL(fileList[0]))
+        setFileForSend(fileList[0]);
+    };
+
     const formik = useFormik({
         initialValues: currentProduct,
         validationSchema: ProductSchema,
         enableReinitialize: true,
         onSubmit: async (values, { setFieldError }) => {
             try {
-                await UpdateProduct(values);
+                await UpdateProduct(values, fileForSend);
                 navigate("/products/list");
                 toast.success('Product updated successfully.');
             }
@@ -72,21 +84,34 @@ const UpdateProduct = () => {
             <h1 className="my-3">Update Product</h1>
             {loadingPage ? <h2>Loading ...</h2> :
                 <FormikProvider value={formik} >
-                    <Form autoComplete="off" noValidate onSubmit={handleSubmit} className="col col-6">
-                        <InputGroup
-                            label="Name"
-                            field="name"
-                            touched={touched.name}
-                            error={errors.name}
-                        />
-                        <InputGroup
-                            label="Detail"
-                            field="detail"
-                            touched={touched.detail}
-                            error={errors.detail}
-                        />
-                        <div className="text-end">
-                            <button type="submit" className="btn btn-primary">Update</button>
+                    <Form autoComplete="off" noValidate onSubmit={handleSubmit} className="row">
+                        <div className="col col-6">
+                            <InputGroup
+                                label="Name"
+                                field="name"
+                                touched={touched.name}
+                                error={errors.name}
+                            />
+                            <InputGroup
+                                label="Detail"
+                                field="detail"
+                                touched={touched.detail}
+                                error={errors.detail}
+                            />
+                            <div className="text-end">
+                                <button type="submit" className="btn btn-primary">Create</button>
+                            </div>
+                        </div>
+                        <div className="col col-6">
+                            <div className="mb-3">
+                                <label htmlFor="Image">
+                                    <img src={fileSelected == "" ? `http://local.laravel.pu911.com:100${currentProduct.image}` : fileSelected}
+                                        width="200px"
+                                        style={{ cursor: "pointer" }}
+                                    />
+                                </label>
+                                <input className="form-control d-none" type="file" name="Image" id="Image" onChange={handleImageChange} />
+                            </div>
                         </div>
                     </Form>
                 </FormikProvider>

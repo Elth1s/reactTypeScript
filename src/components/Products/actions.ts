@@ -26,11 +26,19 @@ export const GetProducts = (search: IProductSearch) => {
     }
 }
 
-export const CreateProduct = (data: IProduct) => {
+export const CreateProduct = (data: IProduct, image: File) => {
     return async () => {
 
         try {
-            await http.post('api/products/store', data)
+            var formData = new FormData();
+            formData.append("name", data.name);
+            formData.append("detail", data.detail);
+            formData.append("file", image);
+            await http.post('api/products/store', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
             return Promise.resolve();
         }
         catch (ex) {
@@ -92,10 +100,19 @@ export const GetProduct = (id: string | null) => {
     }
 }
 
-export const UpdateProduct = (data: IProductItem) => {
+export const UpdateProduct = (data: IProductItem, image?: File) => {
     return async () => {
         try {
-            await http.put(`api/products/update/${data.id}`, data)
+            var formData = new FormData();
+            formData.append("name", data.name);
+            formData.append("detail", data.detail);
+            if (image)
+                formData.append("file", image);
+            await http.post(`api/products/update/${data.id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
             return Promise.resolve();
         }
         catch (ex) {
