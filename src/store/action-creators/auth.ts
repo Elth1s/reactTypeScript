@@ -29,28 +29,36 @@ export const LoginUser = (data: ILoginModel) => {
     }
 }
 
-export const RegisterUser = (data: IRegisterModel) => {
+export const RegisterUser = (data: IRegisterModel, image: File) => {
     return async (dispatch: Dispatch<RegisterAction>) => {
-        // dispatch({ type: AuthActionTypes.REGISTER_AUTH });
-        await http.post<ILoginResponse>('api/auth/register', data)
-            .then(response => {
-                dispatch({
-                    type: AuthActionTypes.REGISTER_AUTH_SUCCESS,
-                    payload: { name: response.data.user.name, email: response.data.user.email }
-                })
-                return Promise.resolve();
-            }).catch(error => {
-                // dispatch({ type: AuthActionTypes.REGISTER_AUTH_ERROR, payload: "Error" })
-                if (axios.isAxiosError(error)) {
-                    const serverError = error as AxiosError<RegisterServerError>;
-                    if (serverError && serverError.response) {
-                        serverError.response.data.status = serverError.response.status;
-                        serverError.response.data.error = serverError.response.statusText;
-                        return Promise.reject(serverError.response.data);
-                    }
+        var formData = new FormData();
+        formData.append("name", data.name);
+        formData.append("email", data.email);
+        formData.append("password", data.password);
+        formData.append("password_confirmation", data.password_confirmation);
+        formData.append("file", image);
+        await http.post<ILoginResponse>('api/auth/register', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }).then(response => {
+            dispatch({
+                type: AuthActionTypes.REGISTER_AUTH_SUCCESS,
+                payload: { name: response.data.user.name, email: response.data.user.email, image: response.data.user.image }
+            })
+            return Promise.resolve();
+        }).catch(error => {
+            // dispatch({ type: AuthActionTypes.REGISTER_AUTH_ERROR, payload: "Error" })
+            if (axios.isAxiosError(error)) {
+                const serverError = error as AxiosError<RegisterServerError>;
+                if (serverError && serverError.response) {
+                    serverError.response.data.status = serverError.response.status;
+                    serverError.response.data.error = serverError.response.statusText;
+                    return Promise.reject(serverError.response.data);
                 }
-                return Promise.reject(error.response.status)
-            });
+            }
+            return Promise.reject(error.response.status)
+        });
     }
 }
 
@@ -61,7 +69,7 @@ export const GetUserProfile = () => {
             const data = response.data;
             dispatch({
                 type: AuthActionTypes.GET_PROFILE,
-                payload: { name: data.name, email: data.email },
+                payload: { name: data.name, email: data.email, image: data.image },
             });
             return Promise.resolve();
         } catch (ex) {
@@ -75,6 +83,6 @@ export const AuthUser = (token: string, dispatch: Dispatch<LoginAction>) => {
     const user = jwt.decode(token) as IUser;
     dispatch({
         type: AuthActionTypes.LOGIN_AUTH_SUCCESS,
-        payload: { name: user.name, email: user.email }
+        payload: { name: user.name, email: user.email, image: user.image }
     })
 }

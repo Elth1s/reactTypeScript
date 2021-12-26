@@ -11,7 +11,8 @@ export enum AuthActionTypes {
 
 export interface IUser {
     name: string,
-    email: string
+    email: string,
+    image: string
 }
 
 export interface ILoginResponse {

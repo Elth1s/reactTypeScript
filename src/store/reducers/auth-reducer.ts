@@ -4,6 +4,7 @@ const initialState: AuthState = {
     user: {
         name: "",
         email: "",
+        image: ""
     },
     error: null,
     isAuth: false,
